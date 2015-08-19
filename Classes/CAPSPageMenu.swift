@@ -117,6 +117,8 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
     
     var tapTimer : NSTimer?
     
+    var enableControllerScrollViewScroll: Bool!
+    
     enum CAPSPageMenuScrollDirection : Int {
         case Left
         case Right
@@ -132,9 +134,9 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
     :param: frame Frame for page menu view
     :param: options Dictionary holding any customization options user might want to set
     */
-    public init(viewControllers: [AnyObject], frame: CGRect, options: [String: AnyObject]?) {
+    public init(viewControllers: [AnyObject], frame: CGRect, options: [String: AnyObject]?, enableControllerScrollViewScroll: Bool = true) {
         super.init(nibName: nil, bundle: nil)
-        
+        self.enableControllerScrollViewScroll = enableControllerScrollViewScroll
         controllerArray = viewControllers
         
         self.view.frame = frame
@@ -262,6 +264,8 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
         controllerScrollView.showsHorizontalScrollIndicator = false
         controllerScrollView.showsVerticalScrollIndicator = false
         
+        controllerScrollView.scrollEnabled = enableControllerScrollViewScroll
+        
         // Set background color behind scroll views and for menu scroll view
         self.view.backgroundColor = viewBackgroundColor
         menuScrollView.backgroundColor = scrollMenuBackgroundColor
@@ -284,6 +288,7 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
         // Disable scrollsToTop for menu and controller scroll views so that iOS finds scroll views within our pages on status bar tap gesture.
         menuScrollView.scrollsToTop = false;
         controllerScrollView.scrollsToTop = false;
+        
         
         // Configure menu scroll view
         if useMenuLikeSegmentedControl {
