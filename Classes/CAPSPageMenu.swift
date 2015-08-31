@@ -315,9 +315,23 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
                 
                 // Set up menu item for menu scroll view
                 var menuItemFrame : CGRect = CGRect()
-                
-                if useMenuLikeSegmentedControl {
+                //add by qky
+                if useMenuLikeSegmentedControl && menuItemWidthBasedOnTitleTextWidth {
+                    
+                    var controllerTitle : String? = (controller as! UIViewController).title
+                    
+                    var titleText : String = controllerTitle != nil ? controllerTitle! : "Menu \(Int(index) + 1)"
+                    
+                    var itemWidthRect : CGRect = (titleText as NSString).boundingRectWithSize(CGSizeMake(1000, 1000), options: NSStringDrawingOptions.UsesLineFragmentOrigin, attributes: [NSFontAttributeName:menuItemFont], context: nil)
+                    
+                    menuItemWidth = itemWidthRect.width
                     menuItemFrame = CGRectMake(self.view.frame.width / CGFloat(controllerArray.count) * CGFloat(index), 0.0, CGFloat(self.view.frame.width) / CGFloat(controllerArray.count), menuHeight)
+                    totalMenuItemWidthIfDifferentWidths += itemWidthRect.width
+                    menuItemWidths.append(itemWidthRect.width)
+                }
+                //add end
+                else if useMenuLikeSegmentedControl {
+                    menuItemFrame = CGRectMake(self.view.frame.width / CGFloat(controllerArray.count) * CGFloat(index), 0.0, menuItemWidth, menuHeight)
                 } else if menuItemWidthBasedOnTitleTextWidth {
                     var controllerTitle : String? = (controller as! UIViewController).title
                     
@@ -382,7 +396,8 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
         
         // Set new content size for menu scroll view if needed
         if menuItemWidthBasedOnTitleTextWidth {
-            menuScrollView.contentSize = CGSizeMake((totalMenuItemWidthIfDifferentWidths + menuMargin) + CGFloat(controllerArray.count) * menuMargin, menuHeight)
+            //removed by qky
+//            menuScrollView.contentSize = CGSizeMake((totalMenuItemWidthIfDifferentWidths + menuMargin) + CGFloat(controllerArray.count) * menuMargin, menuHeight)
         }
         
         // Set selected color for title label of selected menu item
@@ -394,8 +409,12 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
         
         // Configure selection indicator view
         var selectionIndicatorFrame : CGRect = CGRect()
-        
-        if useMenuLikeSegmentedControl {
+        //add by qky
+        if useMenuLikeSegmentedControl && menuItemWidthBasedOnTitleTextWidth {
+            selectionIndicatorFrame = CGRectMake(CGFloat(self.view.frame.width) / CGFloat(controllerArray.count) / 2 - menuItemWidths[0]/2, menuHeight - selectionIndicatorHeight - 10, menuItemWidths[0], selectionIndicatorHeight)
+        }
+        //add end
+        else if useMenuLikeSegmentedControl {
             selectionIndicatorFrame = CGRectMake(0.0, menuHeight - selectionIndicatorHeight, self.view.frame.width / CGFloat(controllerArray.count), selectionIndicatorHeight)
         } else if menuItemWidthBasedOnTitleTextWidth {
             selectionIndicatorFrame = CGRectMake(menuMargin, menuHeight - selectionIndicatorHeight, menuItemWidths[0], selectionIndicatorHeight)
@@ -599,7 +618,13 @@ public class CAPSPageMenu: UIViewController, UIScrollViewDelegate, UIGestureReco
                 var selectionIndicatorWidth : CGFloat = self.selectionIndicatorView.frame.width
                 var selectionIndicatorX : CGFloat = 0.0
                 
-                if self.useMenuLikeSegmentedControl {
+                //add by qky
+                if self.useMenuLikeSegmentedControl && self.menuItemWidthBasedOnTitleTextWidth {
+                    selectionIndicatorX = CGFloat(pageIndex) * (self.view.frame.width / CGFloat(self.controllerArray.count)) + (self.view.frame.width / CGFloat(self.controllerArray.count))/2 - self.menuItemWidths[pageIndex]/2
+                    selectionIndicatorWidth = self.menuItemWidths[pageIndex]
+                }
+                //add end
+                else if self.useMenuLikeSegmentedControl {
                     selectionIndicatorX = CGFloat(pageIndex) * (self.view.frame.width / CGFloat(self.controllerArray.count))
                     selectionIndicatorWidth = self.view.frame.width / CGFloat(self.controllerArray.count)
                 } else if self.menuItemWidthBasedOnTitleTextWidth {
